@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const package = require("./package");
+const { debug } = require("console");
 
 // Helpers
 const reset = "\x1b[0m";
@@ -23,13 +24,15 @@ function fileExists(path) {
 log(`${package.name}@${package.version}`);
 
 try {
-  const lIndex = __dirname.lastIndexOf("/node_modules/");
+  //Cross platform compatibility
+  const lIndex = path.resolve(__dirname).lastIndexOf("node_modules");
   if (lIndex === -1) {
     throw "- Could not find node_modules directory in __dirname";
   }
 
-  const base = path.resolve(__dirname.slice(0, lIndex));
-  const atLink = path.resolve(base, "node_modules/$");
+  //Shift one position to the left because '\' was removed from line 28
+  const base = path.resolve(__dirname.slice(0, lIndex-1));
+  const atLink = path.resolve(base, "node_modules", '$');
 
   if (fileExists(atLink)) {
     if (base === fs.realpathSync(atLink)) {
